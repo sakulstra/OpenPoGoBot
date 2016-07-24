@@ -4,7 +4,7 @@ from cell_workers import PokemonCatchWorker
 from cell_workers.utils import distance
 from events import IEventHandler
 
-class CachablePokemonHandler(IEventHandler):
+class CatchablePokemonHandler(IEventHandler):
     handles = 'cell_work_cachable_pokemon'
 
     def process(self, **kwargs):
