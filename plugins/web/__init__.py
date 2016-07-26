@@ -1,4 +1,5 @@
 from threading import Thread
+import os
 from flask import Flask, request, jsonify, render_template, send_from_directory
 from flask_socketio import SocketIO, send, emit
 
@@ -6,8 +7,11 @@ from pokemongo_bot import logger, event_manager
 from pokemongo_bot.event_manager import manager
 
 def run_flask():
-    app = Flask(__name__, static_url_path='')
+    root_dir = os.path.join(os.getcwd(), 'web')
+    print(root_dir)
+    app = Flask(__name__, static_folder = root_dir)
     app.use_reloader = False
+    app.debug = False
     app.config["SECRET_KEY"] = "OpenPoGoBot"
     socketio = SocketIO(app)
 
@@ -17,21 +21,9 @@ def run_flask():
     def index():
         return app.send_static_file("index.html")
 
-    @app.route("/js/<path:path>")
-    def send_javascript():
-        return send_from_directory("js", path)
-
-    @app.route("/css/<path:path>")
-    def send_stylesheet():
-        return send_from_directory("css", path)
-
-    @app.route("/images/<path:path>")
-    def send_images():
-        return send_from_directory("images", path)
-
-    @app.route("/data/<path:path>")
-    def send_data():
-        return send_from_directory("data", path)
+    @app.route('/<path:path>')
+    def static_proxy(path):
+        return app.send_static_file(path)
 
     @manager.on("logging_output")
     def logging_event(event_name, output, color):
